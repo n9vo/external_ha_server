@@ -1,0 +1,7 @@
+tunnel: 69add433-861d-449b-b01d-6f86f51b9652
+credentials-file: C:/Users/Ben/.cloudflared/69add433-861d-449b-b01d-6f86f51b9652.json
+
+ingress:
+  - hostname: inference.hershey.cloud
+    service: http://localhost:6000
+  - service: http_status:404

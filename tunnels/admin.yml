@@ -1,0 +1,7 @@
+tunnel: cd570bae-f9b6-4af2-a0ec-b998d4c3dac2
+credentials-file: C:/Users/Ben/.cloudflared/cd570bae-f9b6-4af2-a0ec-b998d4c3dac2.json
+
+ingress:
+  - hostname: admin.hershey.cloud
+    service: http://localhost:7000
+  - service: http_status:404

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+  <title>Hershey.Cloud ADMIN</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Animations */
+    @keyframes slideIn {
+      0% {
+        opacity: 0;
+        transform: translateX(-50px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* Content Panels Animation */
+    .panel-content {
+      animation: slideIn 0.7s ease-in-out;
+    }
+
+    /* Sidebar Icon Hover Effect */
+    .hover-icon:hover {
+      transform: scale(1.1);
+      transition: transform 0.3s ease-in-out;
+    }
+
+    /* Active Sidebar Link */
+    .active-link {
+      background: linear-gradient(to right, #4a90e2, #9013fe);
+      color: white;
+      border-radius: 0 1rem 1rem 0;
+      box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Hover effect for sidebar items */
+    .hover-sidebar {
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .hover-sidebar:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .log-entry:hover {
+    transform: scale(1.02);
+    background-color: rgba(100, 116, 139, 0.8); /* Slightly darker background on hover */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Add shadow */
+    }
+
+    /* Change the scrollbar for the log panel */
+    .custom-scrollbar::-webkit-scrollbar {
+    width: 8px; /* Thinner scrollbar */
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(156, 163, 175, 0.8); /* Darker gray for thumb */
+    border-radius: 10px; /* More rounded thumb */
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(156, 163, 175, 1); /* Darken on hover */
+    }
+    .log-entry {
+        font-family: 'Roboto', sans-serif; /* Use the imported font */
+        font-size: 1.1rem; /* Slightly increase font size */
+        border: 1px solid rgba(255, 255, 255, 0.1); /* Light border */
+        border-radius: 0.5rem; /* Rounded corners */
+        padding: 1rem; /* More padding */
+        transition: all 0.3s ease; /* Smooth transition for hover */
+    }
+
+    @media (max-width: 768px) {
+        .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        }
+
+        .sidebar.open {
+        transform: translateX(0);
+        }
+
+        .main-content {
+        margin-left: 0;
+        }
+        
+        .toggle-button {
+        display: block;
+        }
+    }
+
+    /* Mobile sidebar toggle button */
+    .toggle-button {
+      display: none;
+      background-color: #4a90e2;
+      padding: 10px;
+      border-radius: 0.5rem;
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      z-index: 1000;
+    }
+
+    .toggle-button svg {
+      width: 30px;
+      height: 30px;
+    }
+
+  </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 to-gray-800 min-h-screen flex text-white">
+
+  <!-- Sidebar Toggle Button (for mobile) -->
+  <button id="sidebar-toggle" class="toggle-button">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  </button>
+
+  <!-- Sidebar -->
+  <div id="sidebar" class="w-64 bg-gray-900 shadow-lg h-full fixed top-0 left-0 p-6">
+    <div class="text-3xl font-bold mb-8">
+      <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400">
+        Admin Panel
+      </span>
+    </div>
+    
+    <!-- Sidebar Links -->
+    <ul class="space-y-8">
+      <li id="logs-link" class="hover-sidebar p-4 rounded-lg flex items-center cursor-pointer active-link">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hover-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v2h6v-2m2-6v6m2 0a2 2 0 100-4h-6M5 7v4a2 2 0 102 2h10a2 2 0 100-4H7V7H5z" />
+        </svg>
+        <span class="ml-4">Logs</span>
+      </li>
+      <li id="file-edit-link" class="hover-sidebar p-4 rounded-lg flex items-center cursor-pointer">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hover-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 20h9m-9 0H3m9 0v-7.9a5.002 5.002 0 00-1-.4m5 2.4V10m0 4h6M9 11h6M3 5v6m0 0H7m-4 0H3m0-4h4" />
+        </svg>
+        <span class="ml-4">Whitelist</span>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="ml-64 w-full p-10 bg-gray-800 min-h-screen">
+    <!-- Logs Content -->
+    <div id="logs-panel" class="panel-content">
+      <h2 class="text-3xl font-extrabold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
+        Logs
+      </h2>
+      <div class="bg-gray-700 p-6 rounded-lg shadow-inner max-h-[calc(100vh-150px)] overflow-y-auto scroll-smooth scrollbar-thin custom-scrollbar" id = "LOGS_PARENT">
+        <ul class="space-y-4" id="LOGS_LIST"></ul>
+      </div>
+    </div>
+
+    <div id="file-edit-panel" class="hidden panel-content">
+        <h2 class="text-3xl font-extrabold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-green-400">
+          Whitelist
+        </h2>
+        
+        <div class="flex flex-col space-y-4">
+          <!-- Input for IP Address -->
+          <div>
+            <label for="ip" class="block mb-2 text-lg font-semibold text-gray-300">Enter IP Address</label>
+            <input 
+              type="text" 
+              id="ip" 
+              class="w-full p-4 bg-gray-700 rounded-lg shadow-inner text-gray-300 placeholder-gray-500 focus:outline-none transition-all transform focus:scale-105 focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+              placeholder="Enter IP here.."
+            >
+          </div>
+      
+          <!-- Dropdown for Whitelist/Unwhitelist -->
+          <div>
+            <label for="wdropdown" class="block mb-2 text-lg font-semibold text-gray-300">Action</label>
+            <select 
+              id="wdropdown" 
+              name="wdropdown" 
+              class="w-full p-4 bg-gray-700 text-gray-300 rounded-lg shadow-inner transition-transform focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="Whitelist">Whitelist</option>
+              <option value="Unwhitelist">Unwhitelist</option>
+            </select>
+          </div>
+      
+          <!-- Update Button -->
+          <div class="flex justify-center mt-6">
+            <button 
+              class="px-8 py-3 bg-gradient-to-r from-green-400 to-blue-500 text-white font-bold rounded-lg hover:scale-105 transition-transform ease-in-out focus:ring-4 focus:ring-blue-500"
+              onclick="save_whitelist()"
+            >
+              Update
+            </button>
+          </div>
+        </div>
+    </div>
+      
+  </div>
+
+  <script>
+    // Sidebar Links
+    const logsLink = document.getElementById('logs-link');
+    const fileEditLink = document.getElementById('file-edit-link');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+
+    // Panels
+    const logsPanel = document.getElementById('logs-panel');
+    const fileEditPanel = document.getElementById('file-edit-panel');
+
+    function resetLinks() {
+      logsLink.classList.remove('active-link');
+      fileEditLink.classList.remove('active-link');
+      logsPanel.classList.add('hidden');
+      fileEditPanel.classList.add('hidden');
+    }
+
+    logsLink.addEventListener('click', () => {
+      resetLinks();
+      logsLink.classList.add('active-link');
+      logsPanel.classList.remove('hidden');
+      load_logs();
+    });
+
+    fileEditLink.addEventListener('click', () => {
+      resetLinks();
+      fileEditLink.classList.add('active-link');
+      fileEditPanel.classList.remove('hidden');
+      load_whitelist();
+    });
+
+    sidebarToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+    });
+
+    async function load_logs() {
+      const res = await fetch('/logs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ key: localStorage.getItem('key') }), 
+      });
+
+      const json = await res.json();
+      if (JSON.stringify(json) == "") { return; }
+
+      const LOGS_LIST = document.getElementById('LOGS_LIST');
+      let str = "";
+
+      for (const log of json) {
+        const user = log.user;
+        const action = log.action;
+        const timestamp = log.timestamp;
+        str += `<li class="log-entry p-4 bg-gray-600 rounded-lg hover:bg-gray-500 transition-all">
+          <span class="font-semibold text-blue-400">[${user}]</span>
+          <span class="text-gray-300"> - ${action}</span>
+          <span class="text-gray-500 text-sm float-right"> (${timestamp}) </span>
+        </li>`;
+      }
+
+      LOGS_LIST.innerHTML += str;
+      const objDiv = document.getElementById("LOGS_PARENT");
+      objDiv.scrollTop = objDiv.scrollHeight;
+    }
+
+
+    async function save_whitelist() {
+      const ip = document.getElementById('ip').value;
+      const state = document.getElementById('wdropdown').value == "Whitelist" ? true : false;
+
+      const res = await fetch('/save_whitelist', {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ key: localStorage.getItem('key'), ip: ip, state: state}), 
+      });
+
+      const text = await res.text()
+
+      const notyf = new Notyf();
+    
+      notyf.open({
+        type: 'info',
+        message: text,
+        duration: 5000, // 5 seconds
+      });
+    }
+
+    document.body.onload = function() {
+      load_logs();
+    }
+  </script>
+</body>
+</html>

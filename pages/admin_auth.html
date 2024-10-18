@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secure Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Animations */
+    @keyframes fadeIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    /* Form Fade In */
+    .fade-in {
+      animation: fadeIn 0.7s ease-in-out;
+    }
+
+    /* Hover Effects */
+    .hover-input:hover {
+      transform: scale(1.02);
+      transition: transform 0.3s ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 to-gray-800 min-h-screen flex items-center justify-center text-white">
+
+  <!-- Password Input Container -->
+  <div class="w-full max-w-md bg-gray-900 rounded-3xl shadow-2xl overflow-hidden p-8 fade-in">
+    <h2 class="text-3xl font-extrabold mb-8 text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400">
+      Enter Password
+    </h2>
+
+    <!-- Password Form -->
+    <form id="passwordForm" class="space-y-6">
+      <input
+        type="password"
+        id="password"
+        class="w-full p-4 bg-gray-700 text-gray-300 placeholder-gray-500 rounded-lg focus:outline-none hover-input transition-transform ease-in-out"
+        placeholder="Enter your password"
+        required
+      />
+
+      <button
+        type="submit"
+        class="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-500 text-white font-bold rounded-lg hover:scale-105 transition-transform ease-in-out"
+      >
+        Submit
+      </button>
+    </form>
+
+    <!-- Response Output (Optional) -->
+    <div id="responseOutput" class="mt-4 text-gray-400"></div>
+  </div>
+
+  <script>
+    document.body.onload = async () => {
+        if (!localStorage.getItem('key')) { return; }
+        
+        const response = await fetch('/auth_key', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ key: localStorage.getItem('key')}), 
+        });
+
+        const res = await response.text();
+
+        if (res != '') {
+            document.open();
+            document.write(res);
+            document.close();
+        }
+    
+    }
+    
+  </script>
+
+  <script>
+    const alph = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()_+-={}[]|:;'.,/?~`"
+
+    function gen() {
+        var str = "";
+        for (var i = 0; i < 30; i++) {  
+            const rand = Math.floor(Math.random() * (alph.length)) + 1
+            str += alph[rand];
+        }
+
+        return str;
+    }
+
+    document.getElementById('passwordForm').addEventListener('submit', async function (e) {
+      e.preventDefault(); 
+      const password = document.getElementById('password').value;
+
+      try {
+        const key = gen();
+
+        const response = await fetch('/auth', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ password: password, key: key}), // Send password in JSON
+        });
+
+        localStorage.setItem('key', key);
+
+        const html = await response.text();
+
+        document.open();
+        document.write(html);
+        document.close();
+
+      } catch (error) {
+        document.getElementById('responseOutput').textContent = 'Error submitting password!';
+      }
+    });
+  </script>
+</body>
+</html>

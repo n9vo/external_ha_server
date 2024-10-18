@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Document</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --background-color: #1c1c1c;
+            --heading-color: #f5f5f5;
+            --subheading-color: #cccccc;
+            --accent-color: #ff6347;
+            --font-family: 'Poppins', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: var(--background-color);
+            font-family: var(--font-family);
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        h1 {
+            font-size: 4rem;
+            color: var(--heading-color);
+            background-color: var(--accent-color);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            margin-bottom: 10px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: slideIn 1.2s ease-out;
+        }
+
+        h1:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        h2 {
+            font-size: 2rem;
+            color: var(--subheading-color);
+            text-align: center;
+            padding: 10px;
+            animation: slideIn 1.4s ease-out;
+            opacity: 0.9;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            0% {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>
+            {MESSAGEHERE}
+        </h1>
+        <h2>
+            {SUBMESSAGEHERE}
+        </h2>
+    </div>
+</body>
+</html>

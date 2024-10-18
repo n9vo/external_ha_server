@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Lights</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            transition: background-color 0.3s ease;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+
+        img {
+            width: 100%;
+            max-width: 600px;
+            border-radius: 15px;
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+        }
+
+        #light-state {
+            font-size: 1.5rem;
+            color: #bb86fc;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            color: #ffffff;
+            background-color: #6200ee;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #3700b3;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        /* Cooldown styles */
+        .disabled {
+            color: #aaaaaa; /* Gray text */
+            pointer-events: none; /* Disable pointer events */
+            cursor: default; /* Change cursor to default */
+        }
+    </style>
+</head>
+<body>
+    <h1>Ben's Lights</h1>
+    <div id="light-state">Current state: {}</div>
+    <img alt="Live Video Feed" loading="lazy" id="preview"> 
+    <p id='ts' style='margin-top: -10px;'></p>
+    
+    <button id="toggle-button">Toggle lights</button>
+    <script>
+        document.getElementById('toggle-button').onclick = function() {
+            // Disable the button to prevent further clicks and apply cooldown styles
+            this.classList.add('disabled');
+
+            // Fetch the data from the server
+            fetch('/toggle', { cache: 'no-store' })
+                .then(response => response.json())
+                .then(data => {
+                    // Update the light state
+                    document.getElementById('light-state').innerText = 'Current state: ' + (data.state ? 'On' : 'Off');
+
+                    // Update the image preview
+                    document.getElementById('preview').src = 'data:image/jpeg;base64,' + data.img;
+
+                    // Update the timestamp
+                    document.getElementById('ts').innerText = 'Image taken at: ' + data.ts;
+                })
+                .finally(() => {
+                    // Re-enable the button after 1.5 seconds and remove cooldown styles
+                    setTimeout(() => {
+                        document.getElementById('toggle-button').classList.remove('disabled');
+                    }, 1500);
+                });
+        };
+    </script>
+</body>
+</html>
