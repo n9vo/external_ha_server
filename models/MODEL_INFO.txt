@@ -1,0 +1,4 @@
+The files in this folder should be:
+ - yolov3.cfg
+ - yolov3.weights
+ - yolov8s.pt

@@ -1,1 +1,3 @@
-models/
+models/yolov3.cfg
+models/yolov3.weights
+models/yolov8s.pt
