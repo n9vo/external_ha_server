@@ -1,3 +1,6 @@
 models/yolov3.cfg
 models/yolov3.weights
 models/yolov8s.pt
+logs.json
+auth/whitelist.json
+auth/admin_sessions.json
