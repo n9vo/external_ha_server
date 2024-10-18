@@ -265,7 +265,8 @@
         </li>`;
       }
 
-      LOGS_LIST.innerHTML += str;
+      LOGS_LIST.innerHTML = str;
+      
       const objDiv = document.getElementById("LOGS_PARENT");
       objDiv.scrollTop = objDiv.scrollHeight;
     }
