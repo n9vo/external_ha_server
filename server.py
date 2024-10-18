@@ -9,9 +9,11 @@ from io import BytesIO
 from modules import ai 
 from modules import api
 from modules import camera
+from modules import websocket
 import time
 import re
 import json
+import asyncio
 
 def b64_to_pil(img):
         img_data = base64.b64decode(img)
@@ -78,6 +80,13 @@ def is_session_active(key):
     else:
         return False
     
+async def start_websocket():
+
+    def callback_(json_):
+        print(json_)
+
+    await websocket.connect(callback_)
+
 lights_app = Flask(__name__)
 inference_app = Flask(__name__)
 admin_app = Flask(__name__)
@@ -175,7 +184,6 @@ def auth():
     else:
 
         return render_template_string(error_page('Auth Error', 'Incorrect password'))
-    
 @admin_app.route('/auth_key', methods=['POST'])
 def auth_key():
     data = request.get_json()
@@ -188,7 +196,6 @@ def auth_key():
         return render_template_string(open('pages/admin.html', 'r').read()) 
     else:
         return ''
-
 @admin_app.route('/logs', methods = ["POST"])
 def logs():
     args = request.get_json()
@@ -197,7 +204,6 @@ def logs():
         return json.dumps(loaded)
     else:
         return ""
-    
 @admin_app.route('/save_whitelist', methods=['POST'])
 def save():
 
@@ -240,5 +246,8 @@ if __name__ == "__main__":
     
     for thread in threads:
         thread.start()
+
+    asyncio.run(start_websocket())
+
     for thread in threads:
         thread.join()
