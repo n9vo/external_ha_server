@@ -207,7 +207,7 @@ def save():
         ip = request.json.get('ip')
         state = request.json.get('state')
 
-        json_ = json.loads(open('auth/whitelist.json', 'r').read())
+        json_ = json.loads(open('auth/whitelist.json', 'r').read()) or {}
 
         json_[ip] = state
 
