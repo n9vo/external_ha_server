@@ -92,7 +92,7 @@
   <!-- Sidebar -->
   <div id="sidebar" class="bg-gray-900 shadow-lg h-full p-6 open">
     <div class="text-3xl font-bold mb-8">
-      <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400">Admin Panel</span>
+      <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400">Hershey Home</span>
     </div>
     
     <!-- Sidebar Links -->
@@ -101,7 +101,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hover-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v2h6v-2m2-6v6m2 0a2 2 0 100-4h-6M5 7v4a2 2 0 102 2h10a2 2 0 100-4H7V7H5z" />
         </svg>
-        <span class="ml-4">Logs</span>
+        <span class="ml-4">Devices</span>
       </li>
     </ul>
   </div>
@@ -148,7 +148,10 @@
     });
 
     logsLink.addEventListener('click', () => {
-      MAINAREA.style.marginLeft = '0'
+      if (window.innerWidth < 769) {
+        MAINAREA.style.marginLeft = '0'
+      }
+      
       sidebar.classList.remove('open');
       logsPanel.classList.remove('hidden');
       logsLink.classList.add('active-link');
