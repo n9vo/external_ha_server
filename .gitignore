@@ -4,3 +4,4 @@ models/yolov8s.pt
 logs.json
 auth/whitelist.json
 auth/admin_sessions.json
+events.json
