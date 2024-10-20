@@ -4,6 +4,7 @@ import base64
 from datetime import datetime
 import numpy as np
 from flask import Flask, request, jsonify, render_template_string
+from flask_socketio import SocketIO, send, emit
 from PIL import Image
 from io import BytesIO
 from modules import ai 
@@ -14,6 +15,11 @@ import time
 import re
 import json
 import asyncio
+import logging
+from werkzeug.serving import WSGIRequestHandler
+
+werkzeug_logger = logging.getLogger('werkzeug')
+werkzeug_logger.disabled = True
 
 def b64_to_pil(img):
         img_data = base64.b64decode(img)
@@ -38,6 +44,7 @@ def log(user, action):
 
     print(f"LOG [{user}] - {action}")
     open('logs.json', 'w').write(new)
+
 
 def error_page(message, submessage):
     return (open('pages/error.html', 'r').read()).replace("{MESSAGEHERE}", message).replace("{SUBMESSAGEHERE}", submessage)
@@ -81,16 +88,41 @@ def is_session_active(key):
         return False
     
 async def start_websocket():
-
+    
     def callback_(json_):
-        print(json_)
+        data = json.loads(open('events.json', 'r').read() or '[]') 
+
+        found = False
+        for i in range(len(data)):
+            curr = data[i]
+            try:
+                if curr['event']['data']['new_state']['entity_id'] == json_['event']['data']['new_state']['entity_id']:
+
+                    data[i] = json_
+                    found = True
+            except KeyError:
+                continue
+        if not found:
+            data.append(json_)
+
+        open('events.json', 'w').write(json.dumps(data))
+
+
+        admin_socket.emit('broadcast_event', data)
 
     await websocket.connect(callback_)
+    
 
 lights_app = Flask(__name__)
-inference_app = Flask(__name__)
-admin_app = Flask(__name__)
 
+inference_app = Flask(__name__)
+
+admin_app = Flask(__name__)
+admin_socket = SocketIO(admin_app)
+@admin_socket.on('connect')
+def on_connect():
+    print("Client connected")
+    emit('welcome', {'message': 'Welcome to the server!'})
 
 @lights_app.before_request
 def check_ip_whitelist():
@@ -226,6 +258,7 @@ def save():
     else:
         return 403
 
+
 def run_lights_app():
     lights_app.run(host="0.0.0.0", port=5000)
 
@@ -233,7 +266,7 @@ def run_inference_app():
     inference_app.run(host="0.0.0.0", port=6000)
 
 def run_admin_app():
-    admin_app.run(host='0.0.0.0', port=7000)
+    admin_socket.run(app=admin_app, host='0.0.0.0', port=7000)
 
 if __name__ == "__main__":
     log("Server", "Starting UP")

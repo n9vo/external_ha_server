@@ -7,110 +7,77 @@
   <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
   <title>Hershey.Cloud ADMIN</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  
   <style>
     /* Animations */
     @keyframes slideIn {
-      0% {
-        opacity: 0;
-        transform: translateX(-50px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateX(0);
-      }
+      0% { opacity: 0; transform: translateX(-50px); }
+      100% { opacity: 1; transform: translateX(0); }
     }
-
-    /* Content Panels Animation */
-    .panel-content {
-      animation: slideIn 0.7s ease-in-out;
-    }
+    .panel-content { animation: slideIn 0.7s ease-in-out; }
 
     /* Sidebar Icon Hover Effect */
-    .hover-icon:hover {
-      transform: scale(1.1);
-      transition: transform 0.3s ease-in-out;
-    }
+    .hover-icon:hover { transform: scale(1.1); transition: transform 0.3s ease-in-out; }
 
     /* Active Sidebar Link */
-    .active-link {
-      background: linear-gradient(to right, #4a90e2, #9013fe);
-      color: white;
-      border-radius: 0 1rem 1rem 0;
-      box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
-    }
+    .active-link { background: linear-gradient(to right, #4a90e2, #9013fe); color: white; border-radius: 0 1rem 1rem 0; box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1); }
 
-    /* Hover effect for sidebar items */
-    .hover-sidebar {
-      transition: background-color 0.3s ease, color 0.3s ease;
-    }
-    .hover-sidebar:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-    }
-
-    .log-entry:hover {
-    transform: scale(1.02);
-    background-color: rgba(100, 116, 139, 0.8); /* Slightly darker background on hover */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Add shadow */
-    }
-
-    /* Change the scrollbar for the log panel */
-    .custom-scrollbar::-webkit-scrollbar {
-    width: 8px; /* Thinner scrollbar */
-    }
-
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: rgba(156, 163, 175, 0.8); /* Darker gray for thumb */
-    border-radius: 10px; /* More rounded thumb */
-    }
-
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(156, 163, 175, 1); /* Darken on hover */
-    }
-    .log-entry {
-        font-family: 'Roboto', sans-serif; /* Use the imported font */
-        font-size: 1.1rem; /* Slightly increase font size */
-        border: 1px solid rgba(255, 255, 255, 0.1); /* Light border */
-        border-radius: 0.5rem; /* Rounded corners */
-        padding: 1rem; /* More padding */
-        transition: all 0.3s ease; /* Smooth transition for hover */
-    }
-
+    /* Mobile sidebar */
     @media (max-width: 768px) {
-        .sidebar {
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
-        }
-
-        .sidebar.open {
-        transform: translateX(0);
-        }
-
-        .main-content {
-        margin-left: 0;
-        }
-        
-        .toggle-button {
-        display: block;
-        }
+      #sidebar { 
+        transform: translateX(-100%); 
+        transition: transform 0.3s ease; 
+        position: fixed; 
+        z-index: 1000; 
+        width: calc(100vw); 
+        height: 100vh; 
+      }
+      #sidebar.open { 
+        transform: translateX(0); 
+      }
+      .toggle-button { display: block; z-index: 1100; background-color: #4a90e2; padding: 10px; border-radius: 8px; color: white; position: fixed; top: 20px; right: 20px; }
+      .toggle-button svg { width: 30px; height: 30px; }
+      .floating-btn { bottom: 70px; right: 20px; } /* Floating button higher on mobile */
     }
 
-    /* Mobile sidebar toggle button */
-    .toggle-button {
-      display: none;
-      background-color: #4a90e2;
-      padding: 10px;
-      border-radius: 0.5rem;
+    /* Desktop sidebar */
+    @media (min-width: 769px) {
+      .toggle-button { display: none; }
+      #sidebar { position: fixed; top: 0; left: 0; width: 250px; height: 100vh; }
+      .floating-btn { bottom: 20px; right: 20px; }
+    }
+
+    /* Logs grid */
+    #LOGS_LIST {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    /* Log cards */
+    .LOG_TYPE {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+      max-height: 100vh;
+      overflow-y: auto;
+    }
+
+    /* Collapsed log content */
+    .collapsed .dropdown-content { display: none; }
+
+    /* Floating Action Button */
+    .floating-btn {
       position: fixed;
-      top: 1rem;
-      left: 1rem;
+      background-color: #3b82f6;
+      color: white;
+      padding: 15px;
+      border-radius: 50%;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
       z-index: 1000;
+      transition: transform 0.3s ease;
     }
-
-    .toggle-button svg {
-      width: 30px;
-      height: 30px;
-    }
-
+    .floating-btn:hover { transform: scale(1.1); }
   </style>
 </head>
 <body class="bg-gradient-to-br from-gray-900 to-gray-800 min-h-screen flex text-white">
@@ -123,11 +90,9 @@
   </button>
 
   <!-- Sidebar -->
-  <div id="sidebar" class="w-64 bg-gray-900 shadow-lg h-full fixed top-0 left-0 p-6">
+  <div id="sidebar" class="bg-gray-900 shadow-lg h-full p-6 open">
     <div class="text-3xl font-bold mb-8">
-      <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400">
-        Admin Panel
-      </span>
+      <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400">Admin Panel</span>
     </div>
     
     <!-- Sidebar Links -->
@@ -138,166 +103,151 @@
         </svg>
         <span class="ml-4">Logs</span>
       </li>
-      <li id="file-edit-link" class="hover-sidebar p-4 rounded-lg flex items-center cursor-pointer">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hover-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 20h9m-9 0H3m9 0v-7.9a5.002 5.002 0 00-1-.4m5 2.4V10m0 4h6M9 11h6M3 5v6m0 0H7m-4 0H3m0-4h4" />
-        </svg>
-        <span class="ml-4">Whitelist</span>
-      </li>
     </ul>
   </div>
 
   <!-- Main Content Area -->
-  <div class="ml-64 w-full p-10 bg-gray-800 min-h-screen">
+  <div class="ml-64 w-full p-10 bg-gray-800 min-h-screen" id = "MAINAREA">
     <!-- Logs Content -->
     <div id="logs-panel" class="panel-content">
       <h2 class="text-3xl font-extrabold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
-        Logs
+        Devices
       </h2>
-      <div class="bg-gray-700 p-6 rounded-lg shadow-inner max-h-[calc(100vh-150px)] overflow-y-auto scroll-smooth scrollbar-thin custom-scrollbar" id = "LOGS_PARENT">
-        <ul class="space-y-4" id="LOGS_LIST"></ul>
+      
+      <!-- Search Bar -->
+      <input type="text" id="log-search" placeholder="Search Logs..." class="p-2 mb-4 w-full text-black rounded-lg">
+      
+      <!-- Cards Container for Logs -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <ul id="LOGS_LIST">
+          <!-- Logs will be populated dynamically -->
+        </ul>
       </div>
     </div>
 
-    <div id="file-edit-panel" class="hidden panel-content">
-        <h2 class="text-3xl font-extrabold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-green-400">
-          Whitelist
-        </h2>
-        
-        <div class="flex flex-col space-y-4">
-          <!-- Input for IP Address -->
-          <div>
-            <label for="ip" class="block mb-2 text-lg font-semibold text-gray-300">Enter IP Address</label>
-            <input 
-              type="text" 
-              id="ip" 
-              class="w-full p-4 bg-gray-700 rounded-lg shadow-inner text-gray-300 placeholder-gray-500 focus:outline-none transition-all transform focus:scale-105 focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-              placeholder="Enter IP here.."
-            >
-          </div>
-      
-          <!-- Dropdown for Whitelist/Unwhitelist -->
-          <div>
-            <label for="wdropdown" class="block mb-2 text-lg font-semibold text-gray-300">Action</label>
-            <select 
-              id="wdropdown" 
-              name="wdropdown" 
-              class="w-full p-4 bg-gray-700 text-gray-300 rounded-lg shadow-inner transition-transform focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="Whitelist">Whitelist</option>
-              <option value="Unwhitelist">Unwhitelist</option>
-            </select>
-          </div>
-      
-          <!-- Update Button -->
-          <div class="flex justify-center mt-6">
-            <button 
-              class="px-8 py-3 bg-gradient-to-r from-green-400 to-blue-500 text-white font-bold rounded-lg hover:scale-105 transition-transform ease-in-out focus:ring-4 focus:ring-blue-500"
-              onclick="save_whitelist()"
-            >
-              Update
-            </button>
-          </div>
-        </div>
-    </div>
-      
   </div>
 
+
   <script>
-    // Sidebar Links
-    const logsLink = document.getElementById('logs-link');
-    const fileEditLink = document.getElementById('file-edit-link');
     const sidebar = document.getElementById('sidebar');
+    const logsPanel = document.getElementById('logs-panel');
+    const logsLink = document.getElementById('logs-link');
+    const MAINAREA = document.getElementById('MAINAREA');
+   
     const sidebarToggle = document.getElementById('sidebar-toggle');
 
-    // Panels
-    const logsPanel = document.getElementById('logs-panel');
-    const fileEditPanel = document.getElementById('file-edit-panel');
-
-    function resetLinks() {
-      logsLink.classList.remove('active-link');
-      fileEditLink.classList.remove('active-link');
-      logsPanel.classList.add('hidden');
-      fileEditPanel.classList.add('hidden');
-    }
-
-    logsLink.addEventListener('click', () => {
-      resetLinks();
-      logsLink.classList.add('active-link');
-      logsPanel.classList.remove('hidden');
-      load_logs();
-    });
-
-    fileEditLink.addEventListener('click', () => {
-      resetLinks();
-      fileEditLink.classList.add('active-link');
-      fileEditPanel.classList.remove('hidden');
-      load_whitelist();
-    });
 
     sidebarToggle.addEventListener('click', () => {
       sidebar.classList.toggle('open');
+      // Adjust main content margin based on sidebar visibility
+      if (sidebar.classList.contains('open')) {
+        MAINAREA.style.marginLeft = window.innerWidth + 'px';
+      } else {
+        MAINAREA.style.marginLeft = '0'
+      }
     });
 
-    async function load_logs() {
-      const res = await fetch('/logs', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ key: localStorage.getItem('key') }), 
+    logsLink.addEventListener('click', () => {
+      MAINAREA.style.marginLeft = '0'
+      sidebar.classList.remove('open');
+      logsPanel.classList.remove('hidden');
+      logsLink.classList.add('active-link');
+    });
+
+
+    const logSearch = document.getElementById('log-search');
+    logSearch.addEventListener('input', (e) => {
+      const searchQuery = e.target.value.toLowerCase();
+      const logs = document.querySelectorAll('.LOG');
+      logs.forEach(log => {
+        const logTitle = log.querySelector('h4').textContent.toLowerCase();
+        log.style.display = logTitle.includes(searchQuery) ? '' : 'none';
       });
+    });
+  </script>
 
-      const json = await res.json();
-      if (JSON.stringify(json) == "") { return; }
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+  <script type="text/javascript" charset="utf-8">
 
-      const LOGS_LIST = document.getElementById('LOGS_LIST');
-      let str = "";
 
-      for (const log of json) {
-        const user = log.user;
-        const action = log.action;
-        const timestamp = log.timestamp;
-        str += `<li class="log-entry p-4 bg-gray-600 rounded-lg hover:bg-gray-500 transition-all">
-          <span class="font-semibold text-blue-400">[${user}]</span>
-          <span class="text-gray-300"> - ${action}</span>
-          <span class="text-gray-500 text-sm float-right"> (${timestamp}) </span>
-        </li>`;
+      function show_log(log) {
+        const logsList = document.getElementById('LOGS_LIST');
+        
+        let existingTypeCard = document.getElementById(`log-type-${log.type}`);
+        
+        if (!existingTypeCard) {
+          existingTypeCard = document.createElement('div');
+          existingTypeCard.setAttribute('id', `log-type-${log.type}`);
+
+          existingTypeCard.innerHTML = `
+              <div>
+                  <h3 class="text-lg font-bold text-white mb-2 LOG_TYPE">${(log.type).replace("_", " ").toUpperCase()}</h3>
+              </div>
+              <div class="dropdown-content"></div>
+          `;
+
+          logsList.appendChild(existingTypeCard);
+        }
+
+        const contentDiv = existingTypeCard.querySelector('.dropdown-content');
+        let existingLogNameCard = document.getElementById('log-name-' + log.identifier);
+        
+        if (existingLogNameCard) {
+          const fieldContent = existingLogNameCard.querySelector('.content');
+          fieldContent.textContent = log.fields[0].content; 
+        } else {
+          const newLogNameCard = document.createElement('div');
+          newLogNameCard.id = 'log-name-' + log.identifier;
+          newLogNameCard.classList.add('LOG');
+
+          newLogNameCard.innerHTML = `
+              <h4 class="font-semibold text-gray-300">${log.name}</h4>
+              <p class="content text-gray-400">Value: ${log.fields[0].content}</p>
+          `;
+
+          contentDiv.appendChild(newLogNameCard);
+        }
       }
 
-      LOGS_LIST.innerHTML = str;
+      var socket = io();
+      socket.on('connect', function() {
+          socket.emit('my event', {data: 'I\'m connected!'});
+      });
+
+      socket.on('broadcast_event', function(json_) {
+        json_.forEach(log => {
+          if (!log.event) { return; }
+
+
+          var log_type = (log.event.data.new_state.entity_id).split('.')[0];
+          var log_name = (log.event.data.new_state.attributes.friendly_name)
+
+          
+          if (((log.event.data.new_state.entity_id).split('.')[0] == ("number"))){ return;}
+
+          if (log_name.includes('Iphone') == true) { return; }
+
+          show_log({
+              "type": log_type,
+              "name": log_name,
+              "identifier": log.event.data.new_state.entity_id,
+              "fields": [
+                {
+                  "title": "State",
+                  "content": log.event.data.new_state.state
+                },
+              ]
+            
+            })
+        });
+        
+      })
+
       
-      const objDiv = document.getElementById("LOGS_PARENT");
-      objDiv.scrollTop = objDiv.scrollHeight;
-    }
-
-
-    async function save_whitelist() {
-      const ip = document.getElementById('ip').value;
-      const state = document.getElementById('wdropdown').value == "Whitelist" ? true : false;
-
-      const res = await fetch('/save_whitelist', {
-        method: "POST",
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ key: localStorage.getItem('key'), ip: ip, state: state}), 
-      });
-
-      const text = await res.text()
-
-      const notyf = new Notyf();
-    
-      notyf.open({
-        type: 'info',
-        message: text,
-        duration: 5000, // 5 seconds
-      });
-    }
-
-    document.body.onload = function() {
-      load_logs();
-    }
+      // document.body.onload = () => {
+      //   document.getElementById('LOGS_LIST').innerHTML = localStorage.getItem("LOGS_STORAGE");
+      // }
   </script>
+
 </body>
 </html>

@@ -4,7 +4,7 @@ import json
 
 
 HA_URL = "ws://192.168.7.49:8123/api/websocket"
-TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI3ZjUyNzdmZTliM2M0ODY2YjkyNTA5ODViMzk4OWRiZSIsImlhdCI6MTcyOTA0NTY0MCwiZXhwIjoyMDQ0NDA1NjQwfQ.-67y0JjE6-2PP4daJnsO4AafUxAG9rfNv8kC6Ieu9Yc"
+TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJiODcwOTE3MTRmMDQ0YjZmOTI4MWM5OGY4OTc2OTQ4NSIsImlhdCI6MTcyOTM4MzQzNCwiZXhwIjoyMDQ0NzQzNDM0fQ.HqjF4wXkT9TmZkvJJT-kYep4cY8LASnvYjibGZmFp1Q"
 PRESENCE_SENSOR_ID = "binary_sensor.esp32s3two_presence"
 
 async def connect(callback):
@@ -19,7 +19,7 @@ async def connect(callback):
 
     res = await websocket.recv()
     if (json.loads(res)['type'] != 'auth_ok'):
-        return print("Error authenticating")
+        return print(f"Error authenticating: {json.loads(res)}")
     
     print("Successfully authenticated with websocket server")
 
