@@ -17,6 +17,8 @@ import json
 import asyncio
 import logging
 from werkzeug.serving import WSGIRequestHandler
+import aiofiles
+
 
 werkzeug_logger = logging.getLogger('werkzeug')
 werkzeug_logger.disabled = True
@@ -87,31 +89,34 @@ def is_session_active(key):
     else:
         return False
     
+event_cache = {}
+
 async def start_websocket():
-    
-    def callback_(json_):
-        data = json.loads(open('events.json', 'r').read() or '[]') 
 
-        found = False
-        for i in range(len(data)):
-            curr = data[i]
-            try:
-                if curr['event']['data']['new_state']['entity_id'] == json_['event']['data']['new_state']['entity_id']:
+    async def callback_(json_):
+        # Check event id in memory first, to avoid unnecessary I/O
+        try:
+            entity_id = json_['event']['data']['new_state']['entity_id']
 
-                    data[i] = json_
-                    found = True
-            except KeyError:
-                continue
-        if not found:
-            data.append(json_)
+            if entity_id not in event_cache or event_cache[entity_id] != json_:
+                # Update the in-memory cache
+                event_cache[entity_id] = json_
 
-        open('events.json', 'w').write(json.dumps(data))
+                # Asynchronously write data to file
+                async with aiofiles.open('events.json', 'w') as f:
+                    await f.write(json.dumps(list(event_cache.values())))
 
-
-        admin_socket.emit('broadcast_event', data)
-
-    await websocket.connect(callback_)
-    
+                # Emit the updated events via admin_socket (if necessary)
+                admin_socket.emit('broadcast_event', list(event_cache.values()))
+        except Exception: 
+            return
+        
+    # Connect to WebSocket with the callback
+    await websocket.connect(callback_, {
+        "id": 6000,
+        "type": "subscribe_events",
+        "event_type": "state_changed"
+    })
 
 lights_app = Flask(__name__)
 
@@ -121,7 +126,7 @@ admin_app = Flask(__name__)
 admin_socket = SocketIO(admin_app)
 @admin_socket.on('connect')
 def on_connect():
-    print("Client connected")
+    log(get_real_ip(), 'Connected to realtime device websocket')
     emit('welcome', {'message': 'Welcome to the server!'})
 
 @lights_app.before_request
