@@ -4,7 +4,7 @@ import json
 json_Data = json.load(open('../config.json', 'r'))
 
 ip = json_Data['ha_ip']
-token = json_data['ha_token']
+token = json_Data['ha_token']
 
 def get_state_data(id):
         url = f"http://{ip}:8123/api/states/{id}"  # Example: light.qhm_1cc9
