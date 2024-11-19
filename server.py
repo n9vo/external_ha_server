@@ -205,8 +205,9 @@ def admin():
 @admin_app.route('/auth', methods=['POST'])
 def auth():
     data = request.get_json()
-
-    if data and data.get('password') == "bombie6376":
+    pswd = json.load(open('config.json', 'r'))['admin_password']
+        
+    if data and data.get('password') == pswd:
         curr = str(int(time.time()))
         key = data.get('key')
 
