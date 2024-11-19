@@ -1,4 +1,6 @@
 {
-  "admin_password": "password_here"
+  "admin_password": "password_here",
+  "ha_ip" : "ip_here",
+  "ha_token" : "token_here"
   
 }
