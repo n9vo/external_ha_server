@@ -2,11 +2,13 @@ import asyncio
 import websockets
 import json
 import aiofiles
+import json
 
-HA_URL = "ws://192.168.7.49:8123/api/websocket"
-TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJiODcwOTE3MTRmMDQ0YjZmOTI4MWM5OGY4OTc2OTQ4NSIsImlhdCI6MTcyOTM4MzQzNCwiZXhwIjoyMDQ0NzQzNDM0fQ.HqjF4wXkT9TmZkvJJT-kYep4cY8LASnvYjibGZmFp1Q"
-PRESENCE_SENSOR_ID = "binary_sensor.esp32s3two_presence"
+ip = json.load(open('../config.json', 'r'))['ha_ip']
+token = json.load(open('../config.json', 'r'))['ha_token']
 
+HA_URL = "ws://" + ip + ":8123/api/websocket"
+TOKEN = token
 
 async def connect(callback, data):
     async with websockets.connect(HA_URL) as websocket:
