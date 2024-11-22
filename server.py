@@ -66,11 +66,9 @@ def check_ip(ip):
 
     whitelist[ip] = False
 
-    # Save the updated whitelist back to the JSON file
     with open(file_path, 'w') as file:
         json.dump(whitelist, file, indent=4)
 
-    # Return False since the IP is new and set to "false"
     return False
 
 def is_session_active(key):
@@ -94,24 +92,19 @@ event_cache = {}
 async def start_websocket():
 
     async def callback_(json_):
-        # Check event id in memory first, to avoid unnecessary I/O
         try:
             entity_id = json_['event']['data']['new_state']['entity_id']
 
             if entity_id not in event_cache or event_cache[entity_id] != json_:
-                # Update the in-memory cache
                 event_cache[entity_id] = json_
 
-                # Asynchronously write data to file
                 async with aiofiles.open('events.json', 'w') as f:
                     await f.write(json.dumps(list(event_cache.values())))
 
-                # Emit the updated events via admin_socket (if necessary)
                 admin_socket.emit('broadcast_event', list(event_cache.values()))
         except Exception: 
             return
         
-    # Connect to WebSocket with the callback
     await websocket.connect(callback_, {
         "id": 6000,
         "type": "subscribe_events",
