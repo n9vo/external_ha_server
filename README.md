@@ -31,7 +31,7 @@ A lightweight Flask server designed to facilitate real-time interactions with Ho
 - Python 3.6 or higher
 - pip (Python package installer)
 - Home Assistant instance
-- Cloudflare account for domain forwarding ([I have created a python (FLASK) api and want to create an addon ...](https://community.home-assistant.io/t/i-have-created-a-python-flask-api-and-want-to-create-an-addon-related-to-that/177556?utm_source=chatgpt.com), [Writing MARKDOWN for your Github README | Analytics Vidhya](https://medium.com/analytics-vidhya/writing-github-readme-e593f278a796?utm_source=chatgpt.com))
+- Cloudflare account for domain forwarding (optional.. you can run this locally)
 
 ### Installation
 
