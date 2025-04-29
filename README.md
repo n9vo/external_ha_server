@@ -78,9 +78,3 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ## 📞 Support
 
 For support or questions, please open an issue in the repository.
-
----
-
-*Note: This README is based on the available information from the repository. For more detailed instructions and updates, please refer to the repository's [README.md](https://github.com/n9vo/external_ha_server/blob/main/README.md).*
-
---- 
